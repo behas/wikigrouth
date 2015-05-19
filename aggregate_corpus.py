@@ -14,7 +14,7 @@ import json
 import csv
 
 import requests
-import wikipedia
+
 
 
 def parse_concepts(skosfile):
@@ -39,7 +39,7 @@ def retrieve_wikipageid(dbpedia_uri):
     dbpedia_uri_json += ".json"
     r = requests.get(dbpedia_uri_json)
     if(r.status_code != 200):
-        print("FAILURE. Request", dbpedia_uri, "failed.")
+        print("FAILURE. Request", r.url, "failed.")
         return None
     else:
         result = r.json()
@@ -52,6 +52,36 @@ def retrieve_wikipageid(dbpedia_uri):
         return page_id[0]['value']
 
 
+def retrieve_wikipedia_page(page_id):
+    API_URL = 'http://en.wikipedia.org/w/api.php'
+    USER_AGENT = 'wikicorpus (https://github.com/behas/wikicorpus/)'
+    params = {
+        'action': 'query',
+        'pageids': page_id,
+        'prop': 'extracts|revisions',
+        'rvlimit': 1,
+        'rvprop': 'content',
+        'rvparse': False,
+        'explaintext': False,
+        'redirects': True,
+        'exsectionformat': 'wiki',
+        'format': 'json'
+    }
+    headers = {
+        'User-Agent': USER_AGENT
+    }
+    r = requests.get(API_URL, params=params, headers=headers)
+    if(r.status_code != 200):
+        print("FAILURE. Request", r.url, "failed.")
+        return None
+    response = r.json()
+    pages = response['query']['pages']
+    page = next (iter (pages.values()))
+    page_text = page['extract']
+    page_html = page['revisions'][0]['*']
+    return page_text, page_html
+
+
 def aggregate_corpus(skosfile, override=False):
     """Main corpus aggregation workflow function."""
     print("Parsing DBPedia concepts from", skosfile)
@@ -59,27 +89,35 @@ def aggregate_corpus(skosfile, override=False):
     if len(concepts) == 0:
         print("No concepts found. Aborting.")
         return
-    outputpath = outputsubdir = skosfile[:-3]
+    outputpath = skosfile[:-3]
     print("Preparing output path", outputpath)
     if not os.path.exists(outputpath):
                     os.makedirs(outputpath)
-    for concept in concepts:
-        print("\nProcessing concept", concept['pptid'], "...")
-        text_file = outputpath + '/' + concept['pptid'] + ".txt"
-        html_file = outputpath + '/' + concept['pptid'] + ".html"
-        if os.path.exists(text_file) or os.path.exists(html_file):
-            if not override:
-                print("Files already aggregated")
-                continue
-        print("Retrieving wikiPageID from", concept['dbpedia_uri'], "...")
-        wikiPageID = retrieve_wikipageid(concept['dbpedia_uri'])
-        print("Retrieving Wikipedia page", wikiPageID, "...")
-        pg = wikipedia.page(None, wikiPageID)
-        with open(text_file, "w") as out_file:
-            out_file.write(pg.content)
-        with open(html_file, "w") as out_file:
-            out_file.write(pg.html())
-        
+    csv_file = outputpath + ".csv"
+    with open(csv_file, 'w') as csv_file:
+        fieldnames = ['pptid', 'dbpedia_uri', 'txt_file', 'html_file']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for concept in concepts:
+            print("\nProcessing concept", concept['pptid'], "...")
+            text_file = outputpath + '/txt/' + concept['pptid'] + ".txt"
+            html_file = outputpath + '/html/' + concept['pptid'] + ".html"
+            if os.path.exists(text_file) or os.path.exists(html_file):
+                if not override:
+                    print("Files already aggregated")
+                    continue
+            print("Retrieving wikiPageID from", concept['dbpedia_uri'], "...")
+            wikiPageID = retrieve_wikipageid(concept['dbpedia_uri'])
+            print("Retrieving Wikipedia page", wikiPageID, "...")
+            page_text, page_html = retrieve_wikipedia_page(wikiPageID)
+            with open(text_file, "w") as out_file:
+                out_file.write(page_text)
+                concept['txt_file'] = os.path.basename(text_file)
+            with open(html_file, "w") as out_file:
+                out_file.write(page_html)
+                concept['html_file'] = os.path.basename(html_file)
+            writer.writerow(concept)
+
 
 parser = argparse.ArgumentParser(
                     description="Aggregate corpus from given SKOS file.")
