@@ -1,18 +1,10 @@
 from __future__ import print_function
 from setuptools import setup
 # from setuptools.command.test import test as TestCommand
-from pip.req import parse_requirements
 import io
 # import sys
 
 import wikigrouth
-
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('requirements.txt')
-# reqs is a list of requirement
-# e.g. ['django==1.5.1', 'mezzanine==1.4.6']
-reqs = [str(ir.req) for ir in install_reqs]
 
 
 def read(*filenames, **kwargs):
@@ -59,8 +51,7 @@ setup(
     packages=['wikigrouth'],
     scripts=['scripts/wikigrouth'],
     platforms='any',
-    install_requires=reqs,
-
+    install_requires=['requests', 'beautifulsoup4'],
     classifiers=[
          'Development Status :: 4 - Beta',
          'Environment :: Console',

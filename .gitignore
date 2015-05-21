@@ -1,1 +1,6 @@
 data/
+build/
+dist/
+wikigrouth.egg-info/
+wikigrouth/__pycache__/
+
