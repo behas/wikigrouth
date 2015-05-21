@@ -1,6 +1,6 @@
 Wikigrouth - A Python tool for extracting entity mentions from a collection of Wikipedia documents.
 
-# What is it good for?
+## What is it good for?
 
 Are you working on some coreference (or named entity) resolution task? Have you already reached the point of evaluating your solution? Then you probably know that you need some ground truth data set...and it is verly likely that you don't have it.
 
@@ -8,7 +8,7 @@ If you are looking for some large-scale and domain-independent data set, then yo
 
 If you are working on some domain-specific task (e.g., sports, medicine, etc.), then Wikigrouth could be your solution. It takes a file containing Wikipedia or DBpedia links as input, grabs all corresponding pages from Wikipedia, and gives you a file of all Wikipedia entity mentions in those pages.
 
-# Usage
+## Usage
 
 Make sure [Python > 3][python] and [pip][pip] are running on your machine:
 
@@ -39,7 +39,7 @@ If you want to override already existing files use:
 Your console will then tell you what's going on.
 
 
-# Corpus Structure
+## Corpus Structure
 
 Taking above example, the generated corpus has the following file structure:
 
@@ -52,7 +52,7 @@ Taking above example, the generated corpus has the following file structure:
       |- Vienna.txt (*Raw text file extracted from HTML page*)
 
 
-## Corpus index file fields
+### Corpus index file fields
 
 For example above:
 
@@ -66,7 +66,7 @@ Meaning of CSV fields:
   * html_file: file name of HTML page retrieved from Wikipedia
   * text_file: file name of extracted text
 
-## Extracted entities file fields
+### Extracted entities file fields
 
 For example above:
 
