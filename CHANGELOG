@@ -1,0 +1,3 @@
+= v0.1 2015-05-21 =
+
+* First release supporting corpus generation from DBpedia URIs in seed file
