@@ -40,11 +40,11 @@ class Corpus:
 
     @property
     def indexfile(self):
-        return self.outputpath + '.csv'
+        return self.outputpath + '/index.csv'
 
     @property
     def entityfile(self):
-        return self.outputpath + '_entities.csv'
+        return self.outputpath + '/entities.csv'
 
     def _ensurepaths(self):
         for path in [self.outputpath, self.htmlpath, self.textpath]:

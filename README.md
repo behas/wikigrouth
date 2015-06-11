@@ -41,10 +41,10 @@ Your console will then tell you what's going on.
 
 ## Corpus Structure
 
-Taking above example, the generated corpus has the following file structure:
+Taking above example, the corpus will be generated in a folder `test` having the following internal file structure:
 
-    |- test.csv (*corpus index file*)
-    |- test_entities.csv (*extracted entities file*)
+    |- index.csv (*corpus index file*)
+    |- entities.csv (*extracted entities file*)
     |- html
       |- Vienna.html (*HTML page downloaded from Wikipedia*)
       |- ...
