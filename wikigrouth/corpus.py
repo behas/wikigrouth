@@ -18,11 +18,22 @@ class Corpus:
             print("Found", len(self.uris), "unique uris in seedfile.")
 
     def _extract_uris(self, seedfile):
-        pattern = "<(http:\/\/dbpedia.org\/resource\/.*)>"
         uris = []
-        with open(seedfile, 'r') as f:
-            contents = f.read()
-            uris = re.findall(pattern, contents)
+        # a really bad way to parse NT
+        if seedfile.endswith(".nt"):
+            with open(seedfile, 'r') as f:
+                for line in f.readlines():
+                    parts = line.split(" ")
+                    if 'skos/core#exactMatch' in parts[1]:
+                        dbpedia_uri = parts[2][1:-1]
+                        uris.append(dbpedia_uri)
+        else:
+            pattern = "<(http:\/\/dbpedia.org\/resource\/.*)>"
+            with open(seedfile, 'r') as f:
+                contents = f.read()
+                uris = re.findall(pattern, contents)
+        # remove categry uris
+        uris = [uri for uri in uris if 'Category:' not in uri]
         return list(set(uris))
 
     @property
