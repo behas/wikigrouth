@@ -1,5 +1,4 @@
 import os
-import re
 import csv
 
 from wikigrouth.wikipage import Wikipage
@@ -18,23 +17,9 @@ class Corpus:
             print("Found", len(self.uris), "unique uris in seedfile.")
 
     def _extract_uris(self, seedfile):
-        uris = []
-        # a really bad way to parse NT
-        if seedfile.endswith(".nt"):
-            with open(seedfile, 'r') as f:
-                for line in f.readlines():
-                    parts = line.split(" ")
-                    if 'skos/core#exactMatch' in parts[1]:
-                        dbpedia_uri = parts[2][1:-1]
-                        uris.append(dbpedia_uri)
-        else:
-            pattern = "<(http:\/\/dbpedia.org\/resource\/.*)>"
-            with open(seedfile, 'r') as f:
-                contents = f.read()
-                uris = re.findall(pattern, contents)
-        # remove categry uris
-        uris = [uri for uri in uris if 'Category:' not in uri]
-        return list(set(uris))
+        with open(seedfile, 'r') as f:
+            uris = f.readlines()
+            return uris
 
     @property
     def outputpath(self):
@@ -75,10 +60,6 @@ class Corpus:
         with open(filename, 'w') as f:
             f.write(content)
 
-    def to_dbpedia(self, wikipedia_uri):
-        return wikipedia_uri.replace("en.wikipedia.org/wiki",
-                                     "dbpedia.org/resource")
-
     def aggregate(self, override=False):
         self._ensurepaths()
         fieldnames_index = ['doc_id', 'uri', 'html_file', 'text_file']
@@ -94,6 +75,7 @@ class Corpus:
             entity_writer.writeheader()
 
             for index, uri in enumerate(self.uris):
+                uri = uri.strip()
                 print("\nProcessing uri", uri, "...")
                 if(os.path.exists(self.htmlfile(uri)) and not override):
                     page = Wikipage(uri, self.htmlfile(uri))
@@ -109,13 +91,12 @@ class Corpus:
                                        'html_file': html_file_rel,
                                        'text_file': text_file_rel})
                 for entity in page.entities:
-                    entity_uri = self.to_dbpedia(entity['uri'])
-                    if(entity_uri in self.uris):
+                    if(entity['uri'] in self.uris):
                         in_seed = 1
                     else:
                         in_seed = 0
                     entity_writer.writerow({'doc_id': index,
                                             'offset': entity['offset'],
                                             'text': entity['text'],
-                                            'uri': entity_uri,
+                                            'uri': entity['uri'],
                                             'in_seed': in_seed})
