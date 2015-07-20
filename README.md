@@ -6,7 +6,7 @@ Are you working on some coreference (or named entity) resolution task? Have you 
 
 If you are looking for some large-scale and domain-independent data set, then you should look into [Wikilinks][wikilinks].
 
-If you are working on some domain-specific task (e.g., sports, medicine, etc.), then Wikigrouth could be your solution. It takes a file containing Wikipedia or DBpedia links as input, grabs all corresponding pages from Wikipedia, and gives you a file of all Wikipedia entity mentions in those pages.
+If you are working on some domain-specific task (e.g., sports, medicine, etc.), then Wikigrouth could be your solution. It takes a file containing Wikipedia URIs as input, grabs all corresponding pages from Wikipedia, and gives you a file of all Wikipedia entity mentions in those pages.
 
 ## Usage
 
@@ -24,9 +24,10 @@ Now clone Wikigrouth...
     pip install -r requirements.txt
     python setup.py install
 
-Create an example seed file (or take some other textual file containg links in the form `<http://dbpedia.org/resource/Vienna>`):
+Create a seed file (`test.txt`) containing a list of Wikipedia page URIs:
 
-    echo "<http://dbpedia.org/resource/Vienna>" > test.txt
+    http://en.wikipedia.org/wiki/Vienna
+    http://en.wikipedia.org/wiki/Berlin
 
 ...and run the corpus generation tool.
 
@@ -41,10 +42,10 @@ Your console will then tell you what's going on.
 
 ## Corpus Structure
 
-Taking above example, the generated corpus has the following file structure:
+Taking above example, the corpus will be generated in a folder `test` having the following internal file structure:
 
-    |- test.csv (*corpus index file*)
-    |- test_entities.csv (*extracted entities file*)
+    |- index.csv (*corpus index file*)
+    |- entities.csv (*extracted entities file*)
     |- html
       |- Vienna.html (*HTML page downloaded from Wikipedia*)
       |- ...
@@ -57,7 +58,8 @@ Taking above example, the generated corpus has the following file structure:
 For example above:
 
     doc_id,uri,html_file,text_file
-    0,http://dbpedia.org/resource/Vienna,Vienna.html,Vienna.txt
+    0,http://en.wikipedia.org/wiki/Vienna,Vienna.html,Vienna.txt
+    1,http://en.wikipedia.org/wiki/Berlin,Berlin.html,Berlin.txt
 
 CSV field semantics:
 
@@ -71,15 +73,18 @@ CSV field semantics:
 For example above:
 
     doc_id,offset,text,uri,in_seed
-    0,21,German,http://dbpedia.org/resource/German_language,0
-    0,99,Austria,http://dbpedia.org/resource/Austria,0
-    0,128,states of Austria,http://dbpedia.org/resource/States_of_Austria,0
-    0,246,metropolitan area,http://dbpedia.org/resource/Metropolitan_area,0
-    0,312,its cultural,http://dbpedia.org/resource/Culture_of_Austria,0
-    0,326,economic,http://dbpedia.org/resource/Economy_of_Austria,0
-    0,340,political,http://dbpedia.org/resource/Politics_of_Austria,0
-    0,368,7th-largest city,http://dbpedia.org/resource/Largest_cities_of_the_European_Union_by_population_within_city_limits,0
-    0,425,European Union,http://dbpedia.org/resource/European_Union,0
+    0,21,German,http://en.wikipedia.org/wiki/German_language,0
+    0,99,Austria,http://en.wikipedia.org/wiki/Austria,0
+    0,128,states of Austria,http://en.wikipedia.org/wiki/States_of_Austria,0
+    0,244,metropolitan area,http://en.wikipedia.org/wiki/Metropolitan_area,0
+    ...
+    1,59,capital of Germany,http://en.wikipedia.org/wiki/Capital_of_Germany,0
+    1,97,states of Germany,http://en.wikipedia.org/wiki/States_of_Germany,0
+    1,208,most populous city proper,http://en.wikipedia.org/wiki/Largest_cities_of_the_European_Union_by_population_within_city_limits,0
+    1,250,most populous urban area,http://en.wikipedia.org/wiki/Largest_urban_areas_of_the_European_Union,0
+    1,282,European Union,http://en.wikipedia.org/wiki/European_Union,0
+    1,353,Spree,http://en.wikipedia.org/wiki/Spree,0
+    1,363,Havel,http://en.wikipedia.org/wiki/Havel,0    
 
 CSV field semantics:
 
@@ -88,11 +93,6 @@ CSV field semantics:
   * text: textual representation of entity
   * uri: unique entity identifier
   * in_seed: whether or not (0=no, 1=yes) entity is part of seed file 
-
-
-## Notes
-
-* At the moment Wikigrouth only supports seed files containing DBPedia URIs.
 
 
 [wikilinks]: http://www.iesl.cs.umass.edu/data/wiki-links

@@ -1,12 +1,11 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString
 
+import os
 import requests
 
 
 class Wikipage:
-
-    # TODO: remove DBPedia dependency and use Wikipedia export page instead
 
     WIKI_INSTANCE = 'http://en.wikipedia.org'
 
@@ -75,37 +74,16 @@ class Wikipage:
 
     def _load_from_wikipedia(self, uri):
         print("Loading page from Wikipedia...")
-        if('dbpedia' not in uri):
-            raise NotImplemented("Cannot process non-DBpedia seed uris.")
-        wikipageID = self._retrieve_wikipageid(uri)
-        page_html = self._retrieve_wikipedia_page(wikipageID)
-        return page_html
 
-    def _retrieve_wikipageid(self, dbpedia_uri):
-        print("Retrieving wikiPageID from", dbpedia_uri, "...")
-        dbpedia_uri_json = dbpedia_uri.replace("resource", "data")
-        dbpedia_uri_json += ".json"
-        r = requests.get(dbpedia_uri_json)
-        if(r.status_code != 200):
-            print("FAILURE. Request", r.url, "failed.")
-            return None
-        else:
-            result = r.json()
-            resource = result.get(dbpedia_uri)
-            if not resource:
-                return None
-            page_id = resource.get("http://dbpedia.org/ontology/wikiPageID")
-            if not page_id:
-                return None
-            return page_id[0]['value']
+        if uri.endswith("/"):
+            uri = uri[:-1]
+        title = os.path.basename(uri).strip()
 
-    def _retrieve_wikipedia_page(self, wikipageID):
-        print("Retrieving Wikipedia page", wikipageID, "...")
         API_URL = Wikipage.WIKI_INSTANCE + '/w/api.php'
         USER_AGENT = 'wikicorpus (https://github.com/behas/wikigrouth/)'
         params = {
             'action': 'query',
-            'pageids': wikipageID,
+            'titles': title,
             'prop': 'revisions',
             'rvlimit': 1,
             'rvprop': 'content',
