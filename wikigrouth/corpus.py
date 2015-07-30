@@ -6,9 +6,13 @@ from wikigrouth.wikipage import Wikipage
 
 class Corpus:
 
-    def __init__(self, seedfile, override=False):
+    def __init__(self, seedfile, outputpath=None, override=False):
         print("***Initalizing corpus creation from seedfile", seedfile, "***")
         self.override = override
+        if outputpath is None:
+            self.outputpath = os.getcwd()
+        else:
+            self.outputpath = outputpath
         self.seedfile = seedfile
         self.uris = self._extract_uris(seedfile)
         if(len(self.uris) == 0):
@@ -20,11 +24,6 @@ class Corpus:
         with open(seedfile, 'r') as f:
             uris = f.readlines()
             return uris
-
-    @property
-    def outputpath(self):
-        sep_index = self.seedfile.find('.')
-        return self.seedfile[:sep_index]
 
     @property
     def htmlpath(self):

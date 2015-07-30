@@ -3,6 +3,7 @@ from bs4.element import Tag, NavigableString
 
 import os
 import requests
+import urllib
 
 
 class Wikipage:
@@ -18,7 +19,7 @@ class Wikipage:
 
     def _process_page(self, page_html):
         """Extracts raw text and named entities from Wikipedia HTML page"""
-        soup = BeautifulSoup(page_html)
+        soup = BeautifulSoup(page_html, 'html.parser')
         soup = self.clean_wiki_page(soup)
 
         content = ""
@@ -78,6 +79,7 @@ class Wikipage:
         if uri.endswith("/"):
             uri = uri[:-1]
         title = os.path.basename(uri).strip()
+        title = urllib.parse.unquote(title)
 
         API_URL = Wikipage.WIKI_INSTANCE + '/w/api.php'
         USER_AGENT = 'wikicorpus (https://github.com/behas/wikigrouth/)'
@@ -95,6 +97,7 @@ class Wikipage:
             'User-Agent': USER_AGENT
         }
         r = requests.get(API_URL, params=params, headers=headers)
+        print(r.url)
         if(r.status_code != 200):
             print("FAILURE. Request", r.url, "failed.")
             return None
