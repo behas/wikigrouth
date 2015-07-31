@@ -14,9 +14,10 @@ import sys
 import wikigrouth
 
 parser = argparse.ArgumentParser(
-                    description="Aggregate corpus from given SKOS file.")
-parser.add_argument('skosfile', type=str, nargs=1,
-                    help="The input SKOS file.")
+                    description="Aggregate corpus from given seed file.")
+parser.add_argument('seedfile', type=str, nargs=1,
+                    help="The input seed file.")
+parser.add_argument('-o', '--outputpath', type=str)
 parser.add_argument('-f', '--force', action='store_true',
                     help="Force override")
 
@@ -26,4 +27,4 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 args = parser.parse_args()
-wikigrouth.aggregate_corpus(args.skosfile[0], args.force)
+wikigrouth.aggregate_corpus(args.seedfile[0], args.outputpath, args.force)

@@ -6,9 +6,13 @@ from wikigrouth.wikipage import Wikipage
 
 class Corpus:
 
-    def __init__(self, seedfile, override=False):
+    def __init__(self, seedfile, outputpath=None, override=False):
         print("***Initalizing corpus creation from seedfile", seedfile, "***")
         self.override = override
+        if outputpath is None:
+            self.outputpath = os.getcwd()
+        else:
+            self.outputpath = outputpath
         self.seedfile = seedfile
         self.uris = self._extract_uris(seedfile)
         if(len(self.uris) == 0):
@@ -20,11 +24,6 @@ class Corpus:
         with open(seedfile, 'r') as f:
             uris = f.readlines()
             return uris
-
-    @property
-    def outputpath(self):
-        sep_index = self.seedfile.find('.')
-        return self.seedfile[:sep_index]
 
     @property
     def htmlpath(self):
@@ -57,6 +56,8 @@ class Corpus:
     def _write_file(self, filename, content, override=False):
         if(not override and os.path.exists(filename)):
             return
+        if content is None:
+            content = "EMPTY"
         with open(filename, 'w') as f:
             f.write(content)
 
@@ -81,6 +82,7 @@ class Corpus:
                     page = Wikipage(uri, self.htmlfile(uri))
                 else:
                     page = Wikipage(uri)
+
                 self._write_file(self.htmlfile(uri), page.html, override)
                 self._write_file(self.textfile(uri), page.text, True)
                 # Recording output in CSV files
