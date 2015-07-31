@@ -11,7 +11,7 @@ from wikigrouth.corpus import Corpus
 __author__ = 'Bernhard Haslhofer (bernhard.haslhofer@ait.ac.at)'
 __copyright__ = 'Copyright 2015, Bernhard Haslhofer'
 __license__ = "MIT"
-__version__ = '0.1.1dev'
+__version__ = '0.1.1'
 
 __all__ = ['aggregate_corpus']
 
