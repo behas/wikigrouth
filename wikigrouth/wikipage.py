@@ -15,10 +15,13 @@ class Wikipage:
             self.html = self._load_from_file(html_file)
         else:
             self.html = self._load_from_wikipedia(uri)
-        self.text, self.entities = self._process_page(self.html)
+        if self.html is None:
+            self.text, self.entities = None, []
+        else:
+            self.text, self.entities = self._process_page(self.html)
 
     def _process_page(self, page_html):
-        """Extracts raw text and named entities from Wikipedia HTML page"""
+        print("Extracting raw text and named entities from HTML page")
         soup = BeautifulSoup(page_html, 'html.parser')
         soup = self.clean_wiki_page(soup)
 
@@ -55,7 +58,7 @@ class Wikipage:
         return (content, entities)
 
     def clean_wiki_page(self, soup):
-        """Removes non-textual parts of page."""
+        print("Removes non-textual page parts.")
         for tag in soup.find_all(['table', 'div', 'ul', 'li', 'tr', 'th']):
             tag.decompose()
         for tag in soup.find_all(class_=["mw-editsection",
@@ -102,7 +105,11 @@ class Wikipage:
             print("FAILURE. Request", r.url, "failed.")
             return None
         response = r.json()
-        pages = response['query']['pages']
-        page = next(iter(pages.values()))
-        page_html = page['revisions'][0]['*']
+        try:
+            pages = response['query']['pages']
+            page = next(iter(pages.values()))
+            page_html = page['revisions'][0]['*']
+        except KeyError:
+            print("FAILURE. Couldn't extract HTML snippet from  API response")
+            return None
         return page_html

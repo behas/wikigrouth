@@ -56,6 +56,8 @@ class Corpus:
     def _write_file(self, filename, content, override=False):
         if(not override and os.path.exists(filename)):
             return
+        if content is None:
+            content = "EMPTY"
         with open(filename, 'w') as f:
             f.write(content)
 
@@ -80,6 +82,7 @@ class Corpus:
                     page = Wikipage(uri, self.htmlfile(uri))
                 else:
                     page = Wikipage(uri)
+
                 self._write_file(self.htmlfile(uri), page.html, override)
                 self._write_file(self.textfile(uri), page.text, True)
                 # Recording output in CSV files
