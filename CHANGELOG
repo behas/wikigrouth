@@ -1,8 +1,9 @@
-= v0.0.1 2015-05-30 =
+= v0.1.1 2015-07-31 =
 
 * freezed pip requirements to specific versions
 * updated output directory handling
 * fixed handling of encoded concept URIs
+* fixed handling of Wikipedia error responses
 
 = v0.1 2015-05-21 =
 
