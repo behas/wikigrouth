@@ -15,15 +15,18 @@ class Corpus:
             self.outputpath = outputpath
         self.seedfile = seedfile
         self.uris = self._extract_uris(seedfile)
+        print(self.uris)
         if(len(self.uris) == 0):
             raise ValueError("Seedfile doesn't contain any uris.")
         else:
             print("Found", len(self.uris), "unique uris in seedfile.")
 
     def _extract_uris(self, seedfile):
+        uris = []
         with open(seedfile, 'r') as f:
-            uris = f.readlines()
-            return uris
+            for uri in f.readlines():
+                uris.append(uri.strip())
+        return uris
 
     @property
     def htmlpath(self):
